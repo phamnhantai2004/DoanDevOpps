@@ -1,0 +1,158 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: ["**"]          # chạy khi push BẤT KỲ branch nào
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  # ─────────────────────────────────────────
+  # JOB 1: LINT
+  # ─────────────────────────────────────────
+  lint:
+    name: 🔍 Lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20.x"
+          cache: "npm"
+          cache-dependency-path: |
+            backend/package-lock.json
+            frontend/package-lock.json
+
+      - name: Install Backend deps
+        run: npm ci
+        working-directory: backend
+
+      - name: Lint Backend
+        run: npm run lint
+        working-directory: backend
+
+      - name: Install Frontend deps
+        run: npm ci
+        working-directory: frontend
+
+      - name: Lint Frontend
+        run: npm run lint
+        working-directory: frontend
+
+  # ─────────────────────────────────────────
+  # JOB 2: TEST
+  # ─────────────────────────────────────────
+  test:
+    name: 🧪 Test
+    runs-on: ubuntu-latest
+    needs: lint                # chỉ chạy nếu lint pass
+
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      JWT_SECRET: ${{ secrets.JWT_SECRET || 'ci-test-secret' }}
+      NODE_ENV: test
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20.x"
+          cache: "npm"
+          cache-dependency-path: |
+            backend/package-lock.json
+            frontend/package-lock.json
+
+      - name: Install Backend deps
+        run: npm ci
+        working-directory: backend
+
+      - name: Run Backend Tests
+        run: npm run test
+        working-directory: backend
+
+      - name: Install Frontend deps
+        run: npm ci
+        working-directory: frontend
+
+      - name: Run Frontend Tests
+        run: npm run test
+        working-directory: frontend
+
+  # ─────────────────────────────────────────
+  # JOB 3: BUILD
+  # ─────────────────────────────────────────
+  build:
+    name: 🏗️ Build
+    runs-on: ubuntu-latest
+    needs: test                # chỉ chạy nếu test pass
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20.x"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install Frontend deps
+        run: npm ci
+        working-directory: frontend
+
+      - name: Build Frontend
+        run: npm run build
+        working-directory: frontend
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist
+          path: frontend/dist/
+          retention-days: 7
+
+  # ─────────────────────────────────────────
+  # JOB 4: DOCKER BUILD (chỉ trên main/develop)
+  # ─────────────────────────────────────────
+  docker:
+    name: 🐳 Docker Build
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build & Push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/event-registration:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/event-registration:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
