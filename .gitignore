@@ -26,3 +26,18 @@ npm-debug.log*
 __pycache__/
 *.pyc
 venv/
+
+# SQLite Databases
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+backend/events.db
+backend/events.db-journal
+
+# AI Agent skills
+.agents/
+**/ .agents/
+skills-lock.json
+**/skills-lock.json
+
