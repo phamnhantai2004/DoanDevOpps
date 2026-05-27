@@ -1,6 +1,6 @@
 services:
   event-app:
-    image: vanthuonginfo/event-registration:latest
+    image: phamtai123/event-registration:latest
     build: .
     ports:
       - "5001:5000"
