@@ -1,0 +1,11 @@
+services:
+  event-app:
+    image: vanthuonginfo/event-registration:latest
+    build: .
+    ports:
+      - "5001:5000"
+    env_file:
+      - ../.env
+    environment:
+      - NODE_ENV=production
+      - PORT=5000
