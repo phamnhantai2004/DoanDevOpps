@@ -21,11 +21,18 @@ app.use('/api/events', require('./routes/events'));
 app.use('/api/registrations', require('./routes/registrations'));
 app.use('/api/users', require('./routes/users'));
 
-// Production: serve React build
-if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '../frontend/dist')));
+// Production: serve React build if it exists, otherwise serve API status
+const fs = require('fs');
+const frontendDistPath = path.join(__dirname, '../frontend/dist');
+
+if (process.env.NODE_ENV === 'production' && fs.existsSync(frontendDistPath)) {
+  app.use(express.static(frontendDistPath));
   app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
+    res.sendFile(path.join(frontendDistPath, 'index.html'));
+  });
+} else {
+  app.get('/', (req, res) => {
+    res.json({ success: true, message: 'EventHub API Server is running' });
   });
 }
 
