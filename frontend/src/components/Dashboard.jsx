@@ -1,28 +1,34 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { getEventStats, getEvents } from '../api';
 
 export default function Dashboard({ onViewEvent, onCreateEvent }) {
   const [stats, setStats] = useState(null);
   const [recentEvents, setRecentEvents] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [lastUpdated, setLastUpdated] = useState(null);
+
+  const load = useCallback(async () => {
+    try {
+      const [statsRes, eventsRes] = await Promise.all([
+        getEventStats(),
+        getEvents()
+      ]);
+      setStats(statsRes.data);
+      setRecentEvents(eventsRes.data || []);
+      setLastUpdated(new Date());
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    async function load() {
-      try {
-        const [statsRes, eventsRes] = await Promise.all([
-          getEventStats(),
-          getEvents()
-        ]);
-        setStats(statsRes.data);
-        setRecentEvents(eventsRes.data || []);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    }
     load();
-  }, []);
+    // Auto-refresh mỗi 60 giây
+    const interval = setInterval(load, 60000);
+    return () => clearInterval(interval);
+  }, [load]);
 
   if (loading) return <div className="loading"><div className="spinner"></div></div>;
 
@@ -33,6 +39,18 @@ export default function Dashboard({ onViewEvent, onCreateEvent }) {
       <div className="section-header">
         <h1 className="section-title">📊 Tổng quan hệ thống</h1>
       </div>
+
+      {lastUpdated && (
+        <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>
+          🔄 Cập nhật lần cuối: {lastUpdated.toLocaleTimeString('vi-VN')}
+          <button
+            onClick={load}
+            style={{ marginLeft: '0.75rem', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--primary)', fontSize: '0.8rem' }}
+          >
+            Làm mới
+          </button>
+        </div>
+      )}
 
       <div className="stats-grid">
         <div className="stat-card">
@@ -54,6 +72,11 @@ export default function Dashboard({ onViewEvent, onCreateEvent }) {
           <div className="stat-icon">✅</div>
           <div className="stat-label">Đã hoàn thành</div>
           <div className="stat-value">{stats?.completed || 0}</div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-icon">🚫</div>
+          <div className="stat-label">Đã hủy</div>
+          <div className="stat-value">{stats?.cancelled || 0}</div>
         </div>
         <div className="stat-card">
           <div className="stat-icon">👥</div>
