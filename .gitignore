@@ -57,8 +57,3 @@ __pycache__/
 venv/
 .venv/
 
-# AI Agent skills
-.agents/
-**/ .agents/
-skills-lock.json
-**/skills-lock.json
