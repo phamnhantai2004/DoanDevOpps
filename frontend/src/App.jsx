@@ -280,6 +280,17 @@ function App() {
         )}
       </main>
 
+      <footer style={{
+        textAlign: 'center',
+        padding: '1rem',
+        fontSize: '0.78rem',
+        color: 'var(--text-muted)',
+        borderTop: '1px solid var(--border)',
+        marginTop: 'auto'
+      }}>
+        EventHub v1.0.0 &copy; {new Date().getFullYear()} &mdash; Hệ thống quản lý sự kiện
+      </footer>
+
       {showEventForm && isAdmin && (
         <EventForm
           event={editEvent}
