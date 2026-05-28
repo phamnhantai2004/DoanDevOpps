@@ -1,4 +1,4 @@
-//Kiểm Thử Tự Động Độc Lập (Unit Testing L3
+//Kiểm Thử Tự Động Độc Lập (Unit Testing )
 
 const test = require('node:test');
 const assert = require('node:assert');
