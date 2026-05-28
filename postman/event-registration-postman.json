@@ -1,0 +1,152 @@
+{
+	"info": {
+		"_postman_id": "99574831-2f31-4a2c-ad1e-89e5ff94a6a7",
+		"name": "Event Registration API",
+		"description": "Collection các API kiểm thử cho hệ thống đăng ký sự kiện (Event Registration System)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1. Health Check",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/api/health",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"health"
+					]
+				},
+				"description": "API kiểm tra trạng thái hoạt động cơ bản của server."
+			},
+			"response": []
+		},
+		{
+			"name": "2. Get All Events (Public)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/api/events",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"events"
+					]
+				},
+				"description": "API công khai lấy danh sách toàn bộ các sự kiện đang hoạt động."
+			},
+			"response": []
+		},
+		{
+			"name": "3. User Register",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Nguyen Van A\",\n    \"email\": \"testuser@gmail.com\",\n    \"password\": \"123456\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:5000/api/auth/register",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"auth",
+						"register"
+					]
+				},
+				"description": "API đăng ký tài khoản người dùng mới."
+			},
+			"response": []
+		},
+		{
+			"name": "4. User/Admin Login",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"admin@gmail.com\",\n    \"password\": \"123456\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:5000/api/auth/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"auth",
+						"login"
+					]
+				},
+				"description": "API đăng nhập để lấy mã Token bảo mật JWT."
+			},
+			"response": []
+		},
+		{
+			"name": "5. Create New Event (Admin Only - Protected)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer <DÁN_TOKEN_JWT_VÀO_ĐÂY>",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"title\": \"Hội Thảo Công Nghệ Mới 2026\",\n    \"description\": \"Hội thảo giới thiệu các xu hướng công nghệ Cloud và Devops mới nhất.\",\n    \"location\": \"Hội trường A - Đại học Công nghệ\",\n    \"event_date\": \"2026-06-15T08:00:00.000Z\",\n    \"max_participants\": 100,\n    \"status\": \"upcoming\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:5000/api/events",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"events"
+					]
+				},
+				"description": "API tạo sự kiện mới, yêu cầu đính kèm token của tài khoản Admin ở phần Authorization Header."
+			},
+			"response": []
+		}
+	]
+}
