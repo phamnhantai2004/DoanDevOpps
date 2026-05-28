@@ -1,5 +1,8 @@
+// <<<<<<< feature-qa-test1
 
-//Nơi ghi log khởi tạo kết nối với Supabase
+// //Nơi ghi log khởi tạo kết nối với Supabase
+// =======
+// >>>>>>> backend
 const { createClient } = require('@supabase/supabase-js');
 
 const SUPABASE_URL = process.env.SUPABASE_URL;

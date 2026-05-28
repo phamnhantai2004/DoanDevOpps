@@ -1,5 +1,4 @@
 
-#test
 # Báo cáo Sự cố Hệ thống (Incident Report)
 
 Tài liệu này báo cáo và phân tích 3 sự cố thực tế xảy ra trong quá trình phát triển và vận hành hệ thống EventHub, áp dụng mô hình **Tư duy các tầng (Layer Thinking)** để phân loại và xử lý.
