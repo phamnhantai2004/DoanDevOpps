@@ -1,3 +1,8 @@
+// <<<<<<< feature-qa-test1
+// //Kiểm Thử Tự Động Độc Lập (Unit Testing )
+
+// =======
+// >>>>>>> backend
 const test = require('node:test');
 const assert = require('node:assert');
 const healthRouter = require('../routes/health');

@@ -1,3 +1,7 @@
+// <<<<<<< feature-qa-test1
+// //file trung tâm định nghĩa Middleware xử lý lỗi toàn cục ở dòng 38-41
+// =======
+// >>>>>>> backend
 require('dotenv').config({ path: require('path').join(__dirname, '..', '..', '.env') });
 
 const express = require('express');
@@ -7,8 +11,19 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-app.use(cors({
-  origin: process.env.FRONTEND_URL || '*',
+// <<<<<<< feature-qa-test1
+// const allowedFrontend = (process.env.FRONTEND_URL || '').split(',').map(s => s.trim()).filter(Boolean);
+// app.use(cors({
+//   origin: function(origin, callback) {
+//     if (!origin) return callback(null, true); // allow non-browser tools like curl
+//     if (allowedFrontend.length === 0) return callback(null, true); // allow all when not configured
+//     if (allowedFrontend.includes(origin)) return callback(null, true);
+//     return callback(new Error('CORS policy: Origin not allowed'));
+//   },
+// =======
+// app.use(cors({
+//   origin: process.env.FRONTEND_URL || '*',
+// >>>>>>> backend
   credentials: true
 }));
 app.use(express.json());
